@@ -1,0 +1,33 @@
+<?php
+require_once '../config/conexao.php';
+
+if (isset($_GET['action']) && $_GET['action'] == 'delete') {
+    $id = $_GET['id'];
+    $stmt = $pdo->prepare("DELETE FROM cidades WHERE id = ?");
+    $stmt->execute([$id]);
+    header("Location: ../index.php?msg=Cidade deletada com sucesso!");
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $id = $_POST['id'] ?? null;
+    $nome = $_POST['nome'];
+    $id_pais = $_POST['id_pais'];
+    $populacao = $_POST['populacao'] ?: 0;
+    $area_km2 = $_POST['area_km2'] ?: 0;
+    $clima = $_POST['clima'];
+    $id_governante = $_POST['id_governante'] ?: null;
+    $data_fundacao = $_POST['data_fundacao'] ?: null;
+
+    if ($id) {
+        $sql = "UPDATE cidades SET nome=?, id_pais=?, populacao=?, area_km2=?, clima=?, id_governante=?, data_fundacao=? WHERE id=?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$nome, $id_pais, $populacao, $area_km2, $clima, $id_governante, $data_fundacao, $id]);
+    } else {
+        $sql = "INSERT INTO cidades (nome, id_pais, populacao, area_km2, clima, id_governante, data_fundacao) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$nome, $id_pais, $populacao, $area_km2, $clima, $id_governante, $data_fundacao]);
+    }
+    header("Location: ../index.php?msg=Cidade salva com sucesso!");
+    exit;
+}
